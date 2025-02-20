@@ -7,22 +7,31 @@ def rooms_page(page:ft.Page):
 
     def save_get():
         database.add_room(is_payed.value,is_aviable.value,people_inside.value)
+        list_sub_containers()
         utils.get_rooms_file()
+        
+        
 #update_room_status(room_id, is_available=None, is_paid=None, people_inside=None)
 
-    def update_get(room_id, is_available, is_paid, people_inside):
-        database.update_room_status(room_id, is_available, is_paid, people_inside)
-
+    def update_get(room_id, is_aviable, is_payed, people_inside):
+        database.update_room_status(room_id,is_payed,is_aviable,people_inside)
         utils.get_rooms_file()
-        pass
+
+        
+    def update_get_dialog():
+        show_dialog(button=update_button,idf=room_id)
+        database.update_room_status(room_id.value,is_aviable.value,is_payed.value,people_inside.value)
+        utils.get_rooms_file()
+
+        pass    
 
 
 #room_id.value, is_aviable.value, is_payed.value, people_inside.value
     save_button=ft.ElevatedButton("save",on_click=lambda e:save_get())
 
-    update_button=ft.ElevatedButton("update",on_click=lambda e:update_get(room_id.value, is_aviable.value, is_payed.value, people_inside.value))
+    update_button=ft.ElevatedButton("update",on_click=lambda e:update_get_dialog())
 
-
+    
     room_id=ft.TextField(
         label="room_id",        
           text_size=20,
@@ -37,30 +46,33 @@ def rooms_page(page:ft.Page):
                            label_style=ft.TextStyle(size=20))
     is_payed=ft.Checkbox(label="tab if its payed",
                          label_style=ft.TextStyle(size=20))
+    
 
-
-    sub_cont_details=ft.Column(controls=[room_id,
-                                         people_inside,
-                                         is_payed,
-                                         is_aviable,
-                                         update_button,])
   
   #main funcction000000000000000000000000000
 
     def list_sub_containers():
         containers_main_list=ft.Row(controls=[],wrap=True,scroll="always")
-        
+        name_attr_list=["room_id","is avaible","is payed","people_inside"]
         for i in database.get_rooms():
-           
-            for j in range(len(i)):
-                
-                sub_cont_details.controls[j]=ft.Text(f"{i[j]}thisss")
-                #room_id, is_aviable, is_payed, people_inside
-               
             
-                 
+
+            attr_list=[i[0],
+                        "yess" if i[1]==1 else "noo"
+                       ,"yess" if i[2]==1 else "noo",
+                       i[3]]
+
+           
+            attr_list = ft.Column(controls=[ft.Text(f"{name_attr_list[index]}: {attr_list[index]}") for index in range (len(attr_list))               
+            ])
+            attr_list.controls.append(update_button)
+
             sub_container=ft.Container(
-                    content=sub_cont_details,
+
+                  content=attr_list,
+                    
+
+
                     padding=10,
                     bgcolor="orange",
                     height=270,
@@ -78,7 +90,7 @@ def rooms_page(page:ft.Page):
         padding=20,
         border=ft.border.all(4,"black"),
         border_radius=20,
-    )    
+                         )    
         page.update()
 
         #print("the outer container room content(a row) controls[0] and [1] ",container_rooms.content.controls[0],"zzzzzzz",container_rooms.content.controls[1])
@@ -107,7 +119,7 @@ def rooms_page(page:ft.Page):
 
 #saaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaave
 
-    def show_dialog(e):
+    def show_dialog(button,idf):
         def close_dialog(e):
             dialog.open = False
             page.update()
@@ -118,8 +130,12 @@ def rooms_page(page:ft.Page):
 
             content=ft.Column(controls=[
                 ft.Text("This is a custom window!"),
-                sub_cont_details,
-                save_button,
+                idf,
+                is_payed,
+                is_aviable,
+                people_inside,
+                
+                button,
                 ft.ElevatedButton("Close", on_click= close_dialog)
             ],),
             
@@ -132,14 +148,25 @@ def rooms_page(page:ft.Page):
         page.update()
 
 
-    add_room_button=ft.ElevatedButton("add room",on_click=show_dialog)
+    add_room_button=ft.ElevatedButton("add room",on_click=lambda e: show_dialog(save_button,ft.Text("........")))
+
+    def refresh():
+        page.go("/about")
+        page.go("/rooms")
 
 
+
+    refresh_button= ft.IconButton(
+        icon=ft.icons.REFRESH,  # Choose an icon
+        icon_size=30,  # Adjust size
+        on_click=lambda e: refresh(),  # Define action on click
+        tooltip="refresh",  # Tooltip on hover
+    )
     return ft.View(
         route="/rooms",
         controls=[
             
-            ft.Row(controls=[main_text,about_button,contact_button,add_room_button],alignment=ft.MainAxisAlignment.CENTER),
+            ft.Row(controls=[main_text,about_button,contact_button,add_room_button,refresh_button],alignment=ft.MainAxisAlignment.CENTER),
             ft.Row(controls=[container_rooms,],alignment=ft.MainAxisAlignment.CENTER),
             nav_bar(page),  # Navigation bar
         ],

@@ -6,16 +6,6 @@
 
 
 
-x=5
-def f(x=0):
-    print(x)
-f(x)    
-
-
-
-
-
-
 
 
 
@@ -117,15 +107,11 @@ ft.app(target=main)"""
 
 
 
-
-
-
-list=[5,8,5,8,5]
-arr=[]
-for j in range (5):
-
-    for i in range (len(list)):
-        list.append(i+1)
-    arr.append(list)
-    print (arr)
-
+a=5
+def f():
+    r=a+5
+    def g():
+        return a+6
+    print(g())
+    return r
+print(f())
